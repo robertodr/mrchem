@@ -43,6 +43,7 @@
 
 #include "Nucleus.h"
 #include "properties/DipoleMoment.h"
+#include "properties/GeometryDerivatives.h"
 #include "properties/Magnetizability.h"
 #include "properties/NMRShielding.h"
 #include "properties/OrbitalEnergies.h"
@@ -108,6 +109,7 @@ public:
 
     SCFEnergy &getSCFEnergy() { return this->energy; }
     OrbitalEnergies &getOrbitalEnergies() { return this->epsilon; }
+    GeometryDerivatives &getGeometryDerivatives() { return this->geometry_derivatives; }
     DipoleMoment &getDipoleMoment(const std::string &id) { return this->dipole.at(id); }
     QuadrupoleMoment &getQuadrupoleMoment(const std::string &id) { return this->quadrupole.at(id); }
     Polarizability &getPolarizability(const std::string &id) { return this->polarizability.at(id); }
@@ -133,6 +135,7 @@ protected:
     // Properties
     SCFEnergy energy{};
     OrbitalEnergies epsilon{};
+    GeometryDerivatives geometry_derivatives{};
     PropertyMap<DipoleMoment> dipole{};
     PropertyMap<QuadrupoleMoment> quadrupole{};
     PropertyMap<Polarizability> polarizability{};
