@@ -5,8 +5,8 @@
 #include "parallel.h"
 
 #include "HelmholtzVector.h"
-#include "Orbital.h"
-#include "orbital_utils.h"
+#include "qmfunctions/Orbital.h"
+#include "qmfunctions/orbital_utils.h"
 
 using mrcpp::Printer;
 using mrcpp::Timer;

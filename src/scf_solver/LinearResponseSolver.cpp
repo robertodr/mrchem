@@ -3,10 +3,10 @@
 
 #include "LinearResponseSolver.h"
 #include "HelmholtzVector.h"
-#include "FockOperator.h"
+#include "qmoperators/two_electron/FockOperator.h"
 #include "Accelerator.h"
-#include "Orbital.h"
-#include "orbital_utils.h"
+#include "qmfunctions/Orbital.h"
+#include "qmfunctions/orbital_utils.h"
 
 using mrcpp::Printer;
 using mrcpp::Timer;

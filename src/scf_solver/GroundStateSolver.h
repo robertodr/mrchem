@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SCF.h"
-#include "SCFEnergy.h"
+#include "properties/SCFEnergy.h"
 
 /** @class GroundStateSolver
  *

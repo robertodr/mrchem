@@ -5,14 +5,14 @@
 
 #include "EnergyOptimizer.h"
 #include "HelmholtzVector.h"
-#include "Orbital.h"
-#include "orbital_utils.h"
+#include "qmfunctions/Orbital.h"
+#include "qmfunctions/orbital_utils.h"
 
-#include "FockOperator.h"
-#include "NuclearOperator.h"
-#include "CoulombOperator.h"
-#include "ExchangeOperator.h"
-#include "XCOperator.h"
+#include "qmoperators/one_electron/NuclearOperator.h"
+#include "qmoperators/two_electron/FockOperator.h"
+#include "qmoperators/two_electron/CoulombOperator.h"
+#include "qmoperators/two_electron/ExchangeOperator.h"
+#include "qmoperators/two_electron/XCOperator.h"
 
 using mrcpp::Printer;
 using mrcpp::Timer;

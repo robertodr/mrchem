@@ -1,8 +1,8 @@
 #pragma once
 
-#include "QMOperator.h"
-#include "qmfunctions.h"
-#include "chemistry.h"
+#include "qmoperators/QMOperator.h"
+#include "qmfunctions/qmfunctions.h"
+#include "chemistry/chemistry.h"
 
 namespace mrchem {
 
@@ -62,7 +62,7 @@ public:
 
     ComplexDouble trace(OrbitalVector &Phi);
     ComplexDouble trace(OrbitalVector &Phi, OrbitalVector &X, OrbitalVector &Y);
-    
+
     RankZeroTensorOperator& operator=(QMOperator &O);
     RankZeroTensorOperator& operator+=(QMOperator &O);
     RankZeroTensorOperator& operator-=(QMOperator &O);

@@ -3,9 +3,9 @@
 #include "MRCPP/Timer"
 
 #include "CoulombPotential.h"
-#include "Orbital.h"
-#include "orbital_utils.h"
-#include "density_utils.h"
+#include "qmfunctions/Orbital.h"
+#include "qmfunctions/orbital_utils.h"
+#include "qmfunctions/density_utils.h"
 
 using mrcpp::FunctionTree;
 using mrcpp::PoissonOperator;
