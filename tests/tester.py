@@ -22,6 +22,7 @@ E_XC = ("output", "properties", "scf_energy", "E_xc")
 E_EEXT = ("output", "properties", "scf_energy", "E_eext")
 E_NEXT = ("output", "properties", "scf_energy", "E_next")
 E_EL = ("output", "properties", "scf_energy", "E_el")
+GEOMETRIC_DERIVATIVE = ("output", "properties", "geometric_derivative", "total")
 
 
 def DIPOLE_MOMENT(index):

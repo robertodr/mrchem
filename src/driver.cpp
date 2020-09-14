@@ -65,6 +65,8 @@
 #include "qmoperators/one_electron/H_M_pso.h"
 #include "qmoperators/one_electron/NuclearGradientOperator.h"
 
+#include "properties/GeometricDerivative.h"
+
 #include "scf_solver/GroundStateSolver.h"
 #include "scf_solver/KAIN.h"
 #include "scf_solver/LinearResponseSolver.h"
@@ -178,6 +180,10 @@ void driver::init_properties(const json &json_prop, Molecule &mol) {
             auto &nmr_map = mol.getNMRShieldings();
             if (not nmr_map.count(id)) nmr_map.insert({id, NMRShielding(r_K, r_O)});
         }
+    }
+    if (json_prop.contains("geometric_derivative")) {
+        auto &gradient = mol.getGeometricDerivative();
+        gradient = GeometricDerivative(mol.getNNuclei());
     }
 }
 
@@ -470,8 +476,37 @@ void driver::scf::calc_properties(const json &json_prop, Molecule &mol) {
         if (plevel == 1) mrcpp::print::time(1, "NMR shielding (dia)", t_lap);
     }
 
+    if (json_prop.contains("geometric_derivative")) {
+        t_lap.start();
+        mrcpp::print::header(2, "Computing geometric derivative");
+        const auto &prec = json_prop["geometric_derivative"]["precision"];
+        const auto &smoothing = json_prop["geometric_derivative"]["smooth_prec"];
+        const auto nuclei = mol.getNuclei();
+        auto &nuc = mol.getGeometricDerivative().getNuclear();
+        auto &el = mol.getGeometricDerivative().getElectronic();
+
+        for (auto k = 0; k < mol.getNNuclei(); ++k) {
+            const auto nuc_k = nuclei[k];
+            auto Z_k = nuc_k.getCharge();
+            auto R_k = nuc_k.getCoord();
+            NuclearGradientOperator h(Z_k, R_k, smoothing);
+            h.setup(prec);
+            for (auto l = 0; l < k; ++l) {
+                const auto nuc_l = nuclei[l];
+                auto Z_l = nuc_l.getCharge();
+                auto R_l = nuc_l.getCoord();
+                std::array<double, 3> R_kl = {R_k[0] - R_l[0], R_k[1] - R_l[1], R_k[2] - R_l[2]};
+                auto R_kl_3_2 = std::pow(math_utils::calc_distance(R_k, R_l), 3.0);
+                nuc.row(k) -= Eigen::Map<Eigen::RowVector3d>(R_kl.data()) * (Z_k * Z_l / R_kl_3_2);
+            }
+            el.row(k) = h.trace(Phi).real();
+            h.clear();
+        }
+        mrcpp::print::footer(2, t_lap, 2);
+        if (plevel == 1) mrcpp::print::time(1, "Geometric derivative", t_lap);
+    }
+
     if (json_prop.contains("hyperpolarizability")) MSG_ERROR("Hyperpolarizability not implemented");
-    if (json_prop.contains("geometric_derivative")) MSG_ERROR("Geometric derivative not implemented");
     if (json_prop.contains("hyperfine_coupling")) MSG_ERROR("Hyperfine coupling not implemented");
     if (json_prop.contains("spin_spin_coupling")) MSG_ERROR("Spin-spin coupling not implemented");
 
@@ -856,7 +891,7 @@ void driver::rsp::calc_properties(const json &json_prop, Molecule &mol, int dir,
     }
 
     if (json_prop.contains("hyperpolarizability")) MSG_ERROR("Hyperpolarizability not implemented");
-    if (json_prop.contains("geometry_derivative")) MSG_ERROR("Geometry derivative not implemented");
+    if (json_prop.contains("geometric_derivative")) MSG_ERROR("Geometric derivative not implemented");
     if (json_prop.contains("hyperfine_coupling")) MSG_ERROR("Hyperfine coupling not implemented");
     if (json_prop.contains("spin_spin_coupling")) MSG_ERROR("Spin-spin coupling not implemented");
 

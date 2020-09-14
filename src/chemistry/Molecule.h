@@ -43,7 +43,7 @@
 
 #include "Nucleus.h"
 #include "properties/DipoleMoment.h"
-#include "properties/GeometryDerivatives.h"
+#include "properties/GeometricDerivative.h"
 #include "properties/Magnetizability.h"
 #include "properties/NMRShielding.h"
 #include "properties/OrbitalEnergies.h"
@@ -103,18 +103,19 @@ public:
     nlohmann::json json() const;
     void printGeometry() const;
     void printEnergies(const std::string &txt) const;
+    void printGeometricDerivative() const;
     void printProperties() const;
 
     void initPerturbedOrbitals(bool dynamic);
 
     SCFEnergy &getSCFEnergy() { return this->energy; }
     OrbitalEnergies &getOrbitalEnergies() { return this->epsilon; }
-    GeometryDerivatives &getGeometryDerivatives() { return this->geometry_derivatives; }
     DipoleMoment &getDipoleMoment(const std::string &id) { return this->dipole.at(id); }
     QuadrupoleMoment &getQuadrupoleMoment(const std::string &id) { return this->quadrupole.at(id); }
     Polarizability &getPolarizability(const std::string &id) { return this->polarizability.at(id); }
     Magnetizability &getMagnetizability(const std::string &id) { return this->magnetizability.at(id); }
     NMRShielding &getNMRShielding(const std::string &id) { return this->nmr_shielding.at(id); }
+    GeometricDerivative &getGeometricDerivative() { return this->geometric_derivative; }
 
     PropertyMap<DipoleMoment> &getDipoleMoments() { return this->dipole; }
     PropertyMap<QuadrupoleMoment> &getQuadrupoleMoments() { return this->quadrupole; }
@@ -135,12 +136,12 @@ protected:
     // Properties
     SCFEnergy energy{};
     OrbitalEnergies epsilon{};
-    GeometryDerivatives geometry_derivatives{};
     PropertyMap<DipoleMoment> dipole{};
     PropertyMap<QuadrupoleMoment> quadrupole{};
     PropertyMap<Polarizability> polarizability{};
     PropertyMap<Magnetizability> magnetizability{};
     PropertyMap<NMRShielding> nmr_shielding{};
+    GeometricDerivative geometric_derivative{};
 
     void readCoordinateFile(const std::string &file);
     void readCoordinateString(const std::vector<std::string> &coord_str);

@@ -190,6 +190,12 @@ def write_scf_properties(user_dict, origin):
             "precision": user_dict["world_prec"],
             "r_O": origin
         }
+    if user_dict["Properties"]["geometric_derivative"]:
+        prop_dict["geometric_derivative"] = {
+            "operator": "h_nuc_grad",
+            "precision": user_dict["world_prec"],
+            "smooth_prec": user_dict["Precisions"]["nuclear_prec"],
+        }
     return prop_dict
 
 

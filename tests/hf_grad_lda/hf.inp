@@ -1,0 +1,37 @@
+world_prec = 1.0e-3                 # Overall relative precision
+world_size = 6                      # Size of simulation box 2^n
+
+MPI {
+  numerically_exact = true          # Guarantee identical results in MPI
+}
+
+Basis {
+  order = 6                         # Polynomial order
+}
+
+Molecule {
+$coords
+H      0.0000  0.0000   0.0000
+F      0.0000  0.0000   1.7300
+$end
+}
+
+WaveFunction {
+  method = DFT                      # Wave function method (HF or DFT)
+}
+
+DFT {
+$functionals
+LDA
+$end
+}
+
+Properties {
+  geometric_derivative = true       # Compute geometric derivative
+}
+
+SCF {
+  kain = 3                        # Length of KAIN iterative history
+  orbital_thrs = 1.0e-2           # Convergence threshold in orbital residual
+  guess_type = SAD_DZ             # Type of initial guess: none, mw, gto
+}

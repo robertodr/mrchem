@@ -359,6 +359,12 @@ User input reference
   
     **Default** ``False``
   
+   :geometric_derivative: Compute geometric derivative. 
+  
+    **Type** ``bool``
+  
+    **Default** ``False``
+  
    :plot_density: Plot converged electron density. 
   
     **Type** ``bool``

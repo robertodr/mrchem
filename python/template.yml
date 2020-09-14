@@ -340,6 +340,11 @@ sections:
         default: false
         docstring: |
           Compute NMR shielding tensor.
+      - name: geometric_derivative
+        type: bool
+        default: false
+        docstring: |
+          Compute geometric derivative.
       - name: plot_density
         type: bool
         default: false
