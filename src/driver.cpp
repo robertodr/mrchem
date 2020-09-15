@@ -489,7 +489,8 @@ void driver::scf::calc_properties(const json &json_prop, Molecule &mol) {
             const auto nuc_k = nuclei[k];
             auto Z_k = nuc_k.getCharge();
             auto R_k = nuc_k.getCoord();
-            NuclearGradientOperator h(Z_k, R_k, smoothing);
+            auto smooth = detail::nuclear_gradient_smoothing(mol.getNNuclei(), smoothing, Z_k);
+            NuclearGradientOperator h(Z_k, R_k, smooth);
             h.setup(prec);
             nuc.row(k) = -h.trace(nuclei).real();
             el.row(k) = h.trace(Phi).real();

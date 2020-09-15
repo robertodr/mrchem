@@ -25,12 +25,20 @@
 
 #pragma once
 
+#include <cmath>
+
 #include "MRCPP/MWFunctions"
 
 namespace mrchem {
 
 class NuclearGradientFunction : public mrcpp::RepresentableFunction<3> {
 public:
+    /*!
+     *  @param d: Cartesian component to evaluate (0: x, 1: y, 2: z)
+     *  @param z: Nuclear charge of nucleus
+     *  @param r: Coordinate in space
+     *  @param c: Nuclei- and precision-dependent smoothing parameter
+     */
     NuclearGradientFunction(int d, double z, const mrcpp::Coord<3> &r, double c)
             : D(d)
             , C(c)
@@ -44,11 +52,19 @@ public:
 
 protected:
     int D;             ///< Cartesian direction
-    double C;          ///< Smmothing parameter
+    double C;          ///< Smmothing parameter (nuclei- and precision-dependent)
     double Z;          ///< Nuclear charge
     mrcpp::Coord<3> R; ///< Nuclear coordinate
 
     double du_dr(double r1) const;
 };
+
+namespace detail {
+/*! @brief Compute nucleus- and precision-dependent smoothing parameter */
+inline auto nuclear_gradient_smoothing(int N, double prec, double Z) -> double {
+    auto tmp = prec / (0.00435 * std::pow(Z, 5) * N);
+    return std::cbrt(tmp);
+}
+} // namespace detail
 
 } // namespace mrchem
