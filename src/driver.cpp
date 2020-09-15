@@ -491,14 +491,7 @@ void driver::scf::calc_properties(const json &json_prop, Molecule &mol) {
             auto R_k = nuc_k.getCoord();
             NuclearGradientOperator h(Z_k, R_k, smoothing);
             h.setup(prec);
-            for (auto l = 0; l < k; ++l) {
-                const auto nuc_l = nuclei[l];
-                auto Z_l = nuc_l.getCharge();
-                auto R_l = nuc_l.getCoord();
-                std::array<double, 3> R_kl = {R_k[0] - R_l[0], R_k[1] - R_l[1], R_k[2] - R_l[2]};
-                auto R_kl_3_2 = std::pow(math_utils::calc_distance(R_k, R_l), 3.0);
-                nuc.row(k) -= Eigen::Map<Eigen::RowVector3d>(R_kl.data()) * (Z_k * Z_l / R_kl_3_2);
-            }
+            nuc.row(k) = -h.trace(nuclei).real();
             el.row(k) = h.trace(Phi).real();
             h.clear();
         }
