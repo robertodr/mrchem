@@ -22,7 +22,6 @@ E_XC = ("output", "properties", "scf_energy", "E_xc")
 E_EEXT = ("output", "properties", "scf_energy", "E_eext")
 E_NEXT = ("output", "properties", "scf_energy", "E_next")
 E_EL = ("output", "properties", "scf_energy", "E_el")
-GEOMETRIC_DERIVATIVE = ("output", "properties", "geometric_derivative", "total")
 
 
 def DIPOLE_MOMENT(index):
@@ -57,6 +56,10 @@ def QUADRUPOLE_MOMENT_NUC(index):
 def POLARIZABILITY(frequency):
     return ("output", "properties", "polarizability", f"pol-{frequency:.6f}",
             "tensor")
+
+
+def GEOMETRIC_DERIVATIVE(comp):
+    return ("output", "properties", "geometric_derivative", comp)
 
 
 def run(options, *, input_file, filters=None, extra_args=None):

@@ -1,14 +1,14 @@
-world_prec = 1.0e-3                 # Overall relative precision
+world_prec = 1.0e-8                 # Overall relative precision
 world_size = 6                      # Size of simulation box 2^n
 world_unit = bohr
 
-MPI {
-  numerically_exact = true          # Guarantee identical results in MPI
-}
-
-Basis {
-  order = 6                         # Polynomial order
-}
+#MPI {
+#  numerically_exact = true          # Guarantee identical results in MPI
+#}
+#
+#Basis {
+#  order = 6                         # Polynomial order
+#}
 
 Molecule {
 $coords
