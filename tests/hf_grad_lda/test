@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import math
+import json
 import sys
 from pathlib import Path
 
@@ -8,6 +10,34 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 from tester import *  # isort:skip
 
 options = script_cli()
+
+# compute numerical gradient with a centered-difference, 5-point stencil
+# we have generated the displaced geometries with Psi4
+disp_size = 0.005
+stencil = [1./12, -2./3, 2./3, -1./12]
+# collect energies
+energies = []
+for f in [Path(f"reference/numgrad/{x}.json") for x in ["hf_m2", "hf_m1", "hf_p1", "hf_p2"]]:
+    with f.open("r") as j:
+        data = json.load(j)
+    energies.append(data["output"]["properties"]["scf_energy"]["E_tot"])
+
+# gradient in internal coordinates a.k.a. force
+g_q = sum([s*e for s, e in zip(stencil, energies)]) / disp_size
+print(f"Internals {g_q}")
+# Psi4 uses internal coordinates for displacements
+# This is the transformation matrix back to Cartesian displacements
+B = [ 0.0, 0.0, 0.974486755082, 0.0, 0.0, -0.224445013689]
+# transform from internal to Cartesian coordinates
+# this is laid out as [x_H, y_H, z_H, x_F, y_F, z_F]
+g_c = [g_q * b for b in B]
+print(f"Cartesians {g_c}")
+# finally, mass-weight the Cartesian gradient
+# masses copy-pasted from periodictable.py
+massweighter = [math.sqrt(m) for m in [0.0, 0.0, 1.00794, 0.0, 0.0, 18.9984032]]
+g_c_mw = [g*w for g,w in zip(g_c, massweighter)]
+print(f"Cartesian, mass-weighted gradient {g_c_mw}")
+
 
 filters = {
     SUM_OCCUPIED: rel_tolerance(1.0e-6),
