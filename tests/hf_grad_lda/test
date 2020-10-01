@@ -29,7 +29,8 @@ psi4_nuc_grad = [
 tot_es = []
 ele_es = []
 for f in [
-    Path(f"reference/numgrad/{x}.json") for x in ["hf_m2", "hf_m1", "hf_p1", "hf_p2"]
+    Path(__file__).resolve().parent / f"reference/numgrad/{x}.json"
+    for x in ["hf_m2", "hf_m1", "hf_p1", "hf_p2"]
 ]:
     with f.open("r") as j:
         data = json.load(j)
