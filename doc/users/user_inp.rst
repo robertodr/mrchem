@@ -243,21 +243,28 @@ Properties
 
 Specify which properties to compute. By default, only the ground state SCF
 energy as well as orbital energies will be computed. Currently the following
-properties are available (all are ``false`` by default)
+properties are available (all but the dipole moment are ``false`` by default)
 
 .. code-block:: bash
 
     Properties {
-      dipole_moment = false                 # Compute dipole moment
+      dipole_moment = true                  # Compute dipole moment
       quadrupole_moment = false             # Compute quadrupole moment
       polarizabiltity = false               # Compute polarizability
       magnetizability = false               # Compute magnetizability
       nmr_shielding = false                 # Compute NMR shieldings
+      geometric_derivative = false          # Compute geometric derivative
       plot_density = false                  # Plot converged density
       plot_orbitals = []                    # Plot converged orbitals
     }
 
 Some properties can be further specified in dedicated sections.
+
+.. warning:: The computation of the molecular gradient suffers greatly from
+   numerical noise.  The code replaces the nucleus-electron attraction with a
+   smoothed potential. This can only partially recover the nuclear cusps, even
+   with tight precision.  The molecular gradient is only suited for use in
+   geometry optimization of small molecules and with tight precision thresholds.
 
 Polarizability
 ++++++++++++++

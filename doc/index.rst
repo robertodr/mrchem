@@ -47,6 +47,7 @@ Features in MRChem-1.0.0:
     + Polarizability
     + Magnetizability
     + NMR shielding constant
+    + Geometric derivative
 * Parallel implementation:
     + Shared memory (OpenMP): ~20 cores
     + Distributed memory (MPI): ~100 procs
