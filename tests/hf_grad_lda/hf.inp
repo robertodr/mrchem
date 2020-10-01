@@ -1,19 +1,15 @@
-world_prec = 1.0e-8                 # Overall relative precision
+world_prec = 1.0e-3                 # Overall relative precision
 world_size = 6                      # Size of simulation box 2^n
-world_unit = bohr
+world_unit = angstrom
 
-#MPI {
-#  numerically_exact = true          # Guarantee identical results in MPI
-#}
-#
-#Basis {
-#  order = 6                         # Polynomial order
-#}
+MPI {
+  numerically_exact = true          # Guarantee identical results in MPI
+}
 
 Molecule {
 $coords
-H            0.000000000000     0.000000000000    -1.642850273986
-F            0.000000000000     0.000000000000     0.087149726014
+F           -1.194868474027    -0.244625419775     0.340936636348
+H           -1.672505086978    -0.395082674713     1.107306807211
 $end
 translate = false
 }
@@ -27,5 +23,5 @@ Properties {
 }
 
 SCF {
-  guess_type = SAD_DZ             # Type of initial guess: none, mw, gto
+  guess_type = CORE_DZ              # Type of initial guess: none, mw, gto
 }
