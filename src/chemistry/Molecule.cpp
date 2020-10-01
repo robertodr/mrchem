@@ -212,10 +212,6 @@ void Molecule::printEnergies(const std::string &txt) const {
     epsilon.print(txt);
 }
 
-void Molecule::printGeometricDerivative() const {
-    geometric_derivative.print();
-}
-
 /** @brief Pretty output of molecular properties
  *
  * Only properties that have been initialized will be printed.
@@ -228,8 +224,7 @@ void Molecule::printProperties() const {
     for (const auto &pol : polarizability) pol.second.print(pol.first);
     for (const auto &mag : magnetizability) mag.second.print(mag.first);
     for (const auto &nmr : nmr_shielding) nmr.second.print(nmr.first);
-    // FIXME For now print out always, even when empty
-    printGeometricDerivative();
+    if (not geometric_derivative.empty()) geometric_derivative.at("geometric_derivative").print();
 }
 
 nlohmann::json Molecule::json() const {
@@ -248,13 +243,13 @@ nlohmann::json Molecule::json() const {
 
     json_out["scf_energy"] = energy.json();
     json_out["orbital_energies"] = epsilon.json();
-    // FIXME For now save to JSON always, even when empty
-    json_out["geometric_derivative"] = geometric_derivative.json();
     if (not dipole.empty()) json_out["dipole_moment"] = {};
     if (not quadrupole.empty()) json_out["quadrupole_moment"] = {};
     if (not polarizability.empty()) json_out["polarizability"] = {};
     if (not magnetizability.empty()) json_out["magnetizability"] = {};
     if (not nmr_shielding.empty()) json_out["nmr_shielding"] = {};
+    if (not geometric_derivative.empty())
+        json_out["geometric_derivatives"] = geometric_derivative.at("geometric_derivative").json();
     for (const auto &dip : dipole) json_out["dipole_moment"][dip.first] = dip.second.json();
     for (const auto &qua : quadrupole) json_out["quadrupole_moment"][qua.first] = qua.second.json();
     for (const auto &pol : polarizability) json_out["polarizability"][pol.first] = pol.second.json();

@@ -182,8 +182,9 @@ void driver::init_properties(const json &json_prop, Molecule &mol) {
         }
     }
     if (json_prop.contains("geometric_derivative")) {
-        auto &gradient = mol.getGeometricDerivative();
-        gradient = GeometricDerivative(mol.getNNuclei());
+        auto &grad = mol.getGeometricDerivatives();
+        if (not grad.count("geometric_derivative"))
+            grad.insert({"geometric_derivative", GeometricDerivative(mol.getNNuclei())});
     }
 }
 
