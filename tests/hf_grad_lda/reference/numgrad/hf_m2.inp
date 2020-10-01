@@ -1,13 +1,13 @@
 world_prec = 1.0e-6                 # Overall relative precision
 world_size = 6                      # Size of simulation box 2^n
-world_unit = bohr
+world_unit = angstrom
 
 # use Psi4 naming of displacements
 # displacement 2 of 5 (i.e. point -2 in the stencil) 
 Molecule {
 $coords
-H            0.000000000000     0.000000000000    -1.652557236895
-F            0.000000000000     0.000000000000     0.087664659828
+F           -1.194939558201    -0.244647811546     0.341050691237
+H           -1.671165086722    -0.394660569802     1.105156770557
 $end
 translate = false
 }
@@ -17,5 +17,5 @@ WaveFunction {
 }
 
 SCF {
-  guess_type = SAD_DZ             # Type of initial guess: none, mw, gto
+  guess_type = CORE_DZ             # Type of initial guess: none, mw, gto
 }
