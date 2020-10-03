@@ -23,20 +23,40 @@ psi4_nuc_grad = [
     -2.517338742705,
 ]
 
-# compute numerical gradient with a centered-difference, 5-point stencil
-# we have generated the displaced geometries with Psi4
-# collect energies
-tot_es = []
-ele_es = []
-for f in [
-    Path(__file__).resolve().parent / f"reference/numgrad/{x}.json"
-    for x in ["hf_m2", "hf_m1", "hf_p1", "hf_p2"]
-]:
-    with f.open("r") as j:
-        data = json.load(j)
-    tot_es.append(data["output"]["properties"]["scf_energy"]["E_tot"])
-    ele_es.append(data["output"]["properties"]["scf_energy"]["E_el"])
+# compare against reference
+filters = {
+    SUM_OCCUPIED: rel_tolerance(1.0e-6),
+    E_KIN: rel_tolerance(1.0e-6),
+    E_EN: rel_tolerance(1.0e-6),
+    E_EE: rel_tolerance(1.0e-6),
+    E_X: rel_tolerance(1.0e-6),
+    E_XC: rel_tolerance(1.0e-6),
+    E_EEXT: rel_tolerance(1.0e-6),
+    E_NEXT: rel_tolerance(1.0e-6),
+    E_EL: rel_tolerance(1.0e-6),
+    GEOMETRIC_DERIVATIVE("total"): rel_tolerance(1.0e-6),
+}
 
+ierr = run(options, input_file="hf", filters=filters)
+
+# compare nuclear component of the molecular gradient with Psi4
+with (Path(__file__).resolve().parent / "hf.json").open("r") as o:
+    nuc_grad = json.load(o)["output"]["properties"]["geometric_derivative"]["nuclear"]
+passed, message = compare_values(
+    nuc_grad,
+    psi4_nuc_grad,
+    "MRChem vs. Psi4 nuclear component of the molecular gradient",
+    rtol=1.0e-6,
+    atol=1.0e-6,
+)
+sys.stdout.write(f"{message}\n")
+ierr += 0 if passed else 137
+
+# NOTE This test is not run as part of the test suite: it would always fail at
+# loose `world_prec` and would take too long at tight `world_prec`.
+# You can however uncomment the lines below and run it locally!
+# We compute the numerical gradient with a centered-difference, 5-point stencil
+# The displaced geometries were generated with Psi4
 
 def finite_difference_gradient(energies):
     disp_size = 0.005
@@ -70,38 +90,20 @@ def finite_difference_gradient(energies):
     g_c_mw = [g * w for g, w in zip(g_c, massweighter)]
     return g_c_mw
 
-
-# compare against reference
-filters = {
-    SUM_OCCUPIED: rel_tolerance(1.0e-6),
-    E_KIN: rel_tolerance(1.0e-6),
-    E_EN: rel_tolerance(1.0e-6),
-    E_EE: rel_tolerance(1.0e-6),
-    E_X: rel_tolerance(1.0e-6),
-    E_XC: rel_tolerance(1.0e-6),
-    E_EEXT: rel_tolerance(1.0e-6),
-    E_NEXT: rel_tolerance(1.0e-6),
-    E_EL: rel_tolerance(1.0e-6),
-    GEOMETRIC_DERIVATIVE("total"): rel_tolerance(1.0e-6),
-}
-
-ierr = run(options, input_file="hf", filters=filters)
-
-# compare nuclear component of the molecular gradient with Psi4
-with Path("hf.json").open("r") as o:
-    nuc_grad = json.load(o)["output"]["properties"]["geometric_derivative"]["nuclear"]
-passed, message = compare_values(
-    nuc_grad,
-    psi4_nuc_grad,
-    "MRChem vs. Psi4 nuclear component of the molecular gradient",
-    rtol=1.0e-6,
-    atol=1.0e-6,
-)
-sys.stdout.write(f"{message}\n")
-ierr += 0 if passed else 137
+# collect energies
+#tot_es = []
+#ele_es = []
+#for f in [
+#    Path(__file__).resolve().parent / f"reference/numgrad/{x}.json"
+#    for x in ["hf_m2", "hf_m1", "hf_p1", "hf_p2"]
+#]:
+#    with f.open("r") as j:
+#        data = json.load(j)
+#    tot_es.append(data["output"]["properties"]["scf_energy"]["E_tot"])
+#    ele_es.append(data["output"]["properties"]["scf_energy"]["E_el"])
 
 ## compare analytical vs. numerical electronic component of the molecular gradient
-# with Path("hf.json").open("r") as o:
+# with (Path(__file__).resolve().parent / "hf.json").open("r") as o:
 #    ele_grad = json.load(o)["output"]["properties"]["geometric_derivative"]["electronic"]
 # passed, message = compare_values(ele_grad,
 #                                 finite_difference_gradient(ele_es),
@@ -112,7 +114,7 @@ ierr += 0 if passed else 137
 # ierr += 0 if passed else 137
 #
 ## compare analytical vs. numerical total molecular gradient
-# with Path("hf.json").open("r") as o:
+# with (Path(__file__).resolve().parent / "hf.json").open("r") as o:
 #    tot_grad = json.load(o)["output"]["properties"]["geometric_derivative"]["total"]
 # passed, message = compare_values(tot_grad,
 #                                 finite_difference_gradient(tot_es),

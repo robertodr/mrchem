@@ -249,7 +249,7 @@ nlohmann::json Molecule::json() const {
     if (not magnetizability.empty()) json_out["magnetizability"] = {};
     if (not nmr_shielding.empty()) json_out["nmr_shielding"] = {};
     if (not geometric_derivative.empty())
-        json_out["geometric_derivatives"] = geometric_derivative.at("geometric_derivative").json();
+        json_out["geometric_derivative"] = geometric_derivative.at("geometric_derivative").json();
     for (const auto &dip : dipole) json_out["dipole_moment"][dip.first] = dip.second.json();
     for (const auto &qua : quadrupole) json_out["quadrupole_moment"][qua.first] = qua.second.json();
     for (const auto &pol : polarizability) json_out["polarizability"][pol.first] = pol.second.json();

@@ -1,4 +1,4 @@
-world_prec = 1.0e-3                 # Overall relative precision
+world_prec = 1.0e-2                 # Overall relative precision
 world_size = 6                      # Size of simulation box 2^n
 world_unit = angstrom
 
@@ -23,5 +23,6 @@ Properties {
 }
 
 SCF {
+  run = false
   guess_type = CORE_DZ              # Type of initial guess: none, mw, gto
 }
