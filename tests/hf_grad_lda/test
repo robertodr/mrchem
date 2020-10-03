@@ -40,7 +40,7 @@ filters = {
 ierr = run(options, input_file="hf", filters=filters)
 
 # compare nuclear component of the molecular gradient with Psi4
-with (Path(__file__).resolve().parent / "hf.json").open("r") as o:
+with Path("hf.json").open("r") as o:
     nuc_grad = json.load(o)["output"]["properties"]["geometric_derivative"]["nuclear"]
 passed, message = compare_values(
     nuc_grad,
