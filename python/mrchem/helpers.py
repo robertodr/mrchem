@@ -350,6 +350,7 @@ def write_rsp_calc(omega, user_dict, origin):
             "file_CUBE_y_p": f"{vector_dir}CUBE_y_p_{dir:d}_vector.json",
             "file_CUBE_y_a": f"{vector_dir}CUBE_y_a_{dir:d}_vector.json",
             "file_CUBE_y_b": f"{vector_dir}CUBE_y_b_{dir:d}_vector.json",
+            "seed": rsp_dict["seed"],
         }
         if rsp_dict["write_orbitals"]:
             path_orbitals = rsp_dict["path_orbitals"]

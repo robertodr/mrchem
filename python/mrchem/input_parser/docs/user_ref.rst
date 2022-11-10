@@ -767,14 +767,20 @@ User input reference
     **Predicates**
       - ``1.0e-10 < value < 1.0``
   
-   :guess_type: Type of initial guess for response. ``none`` will start from a zero guess for the response functions. ``chk`` restarts a previous calculation which was dumped using the ``write_checkpoint`` keyword. ``mw`` will start from final orbitals in a previous calculation written using the ``write_orbitals`` keyword. The orbitals will be re-projected into the new computational setup. 
+   :guess_type: Type of initial guess for response. ``none`` will start from a zero guess for the response functions. ``chk`` restarts a previous calculation which was dumped using the ``write_checkpoint`` keyword. ``mw`` will start from final orbitals in a previous calculation written using the ``write_orbitals`` keyword. The orbitals will be re-projected into the new computational setup. ``random`` will start applying a linear combination, with random coefficients, of the application of monomials in x, y, z. 
   
     **Type** ``str``
   
     **Default** ``none``
   
     **Predicates**
-      - ``value.lower() in ['none', 'chk', 'mw', 'cube']``
+      - ``value.lower() in ['none', 'chk', 'mw', 'cube', 'random']``
+  
+   :seed: Seed of the random number generator used for the ``random`` guess. Default value will trigger use of a random seed. 
+  
+    **Type** ``int``
+  
+    **Default** ``0``
   
    :write_checkpoint: Write perturbed orbitals to disk in each iteration, file name ``<path_checkpoint>/<X/Y>_rsp_<direction>_idx_<0..N>``. Can be used as ``chk`` initial guess in subsequent calculations. 
   

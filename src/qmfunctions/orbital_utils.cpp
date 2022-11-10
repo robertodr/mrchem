@@ -106,6 +106,53 @@ ComplexDouble orbital::node_norm_dot(Orbital bra, Orbital ket, bool exact) {
     return qmfunction::node_norm_dot(bra, ket, exact);
 }
 
+void orbital::linear_combination(Orbital &out, const ComplexVector &c, OrbitalVector &inp, double prec) {
+    FunctionTreeVector<3> rvec;
+    FunctionTreeVector<3> ivec;
+
+    double thrs = mrcpp::MachineZero;
+    for (int i = 0; i < inp.size(); i++) {
+        double sign = (inp[i].conjugate()) ? -1.0 : 1.0;
+
+        bool cHasReal = (std::abs(c[i].real()) > thrs);
+        bool cHasImag = (std::abs(c[i].imag()) > thrs);
+
+        if (cHasReal and inp[i].hasReal()) rvec.push_back(std::make_tuple(c[i].real(), &inp[i].real()));
+        if (cHasImag and inp[i].hasImag()) rvec.push_back(std::make_tuple(-sign * c[i].imag(), &inp[i].imag()));
+
+        if (cHasImag and inp[i].hasReal()) ivec.push_back(std::make_tuple(c[i].imag(), &inp[i].real()));
+        if (cHasReal and inp[i].hasImag()) ivec.push_back(std::make_tuple(sign * c[i].real(), &inp[i].imag()));
+    }
+
+    if (rvec.size() > 0 and not out.hasReal()) out.alloc(NUMBER::Real);
+    if (ivec.size() > 0 and not out.hasImag()) out.alloc(NUMBER::Imag);
+
+    bool need_to_add = not(out.isShared()) or mpi::share_master();
+    if (need_to_add) {
+        if (rvec.size() > 0) {
+            if (prec < 0.0) {
+                mrcpp::build_grid(out.real(), rvec);
+                mrcpp::add(prec, out.real(), rvec, 0);
+            } else {
+                mrcpp::add(prec, out.real(), rvec);
+            }
+        } else if (out.hasReal()) {
+            out.real().setZero();
+        }
+        if (ivec.size() > 0) {
+            if (prec < 0.0) {
+                mrcpp::build_grid(out.imag(), ivec);
+                mrcpp::add(prec, out.imag(), ivec, 0);
+            } else {
+                mrcpp::add(prec, out.imag(), ivec);
+            }
+        } else if (out.hasImag()) {
+            out.imag().setZero();
+        }
+    }
+    mpi::share_function(out, 0, 9911, mpi::comm_share);
+}
+
 /** @brief Compare spin and occupation of two orbitals
  *
  *  Returns true if orbital parameters are the same.
@@ -576,9 +623,9 @@ OrbitalVector orbital::rotate(OrbitalVector &Phi, const ComplexMatrix &U, double
                 if (nodeidVec.size() > 0) pointerstodelete.push_back(dataVec);
                 int shift = 0;
                 for (int n = 0; n < nodeidVec.size(); n++) {
-                    if(nodeidVec[n] - max_ix<0){std::cout<<n<<" ERROR "<<nodeidVec[n]<<" "<<max_ix<<std::endl;}
-                    assert(nodeidVec[n] - max_ix >= 0);                // unrotated nodes have been deleted
-                    if(ix2coef.count(nodeidVec[n] - max_ix)!=0){std::cout<<n<<" ERRORix2 "<< ix2coef.count(nodeidVec[n])<<" "<<max_ix<<std::endl;}
+                    if (nodeidVec[n] - max_ix < 0) { std::cout << n << " ERROR " << nodeidVec[n] << " " << max_ix << std::endl; }
+                    assert(nodeidVec[n] - max_ix >= 0); // unrotated nodes have been deleted
+                    if (ix2coef.count(nodeidVec[n] - max_ix) != 0) { std::cout << n << " ERRORix2 " << ix2coef.count(nodeidVec[n]) << " " << max_ix << std::endl; }
                     assert(ix2coef.count(nodeidVec[n] - max_ix) == 0); // each nodeid treated once
                     ix2coef[nodeidVec[n] - max_ix] = ix++;
                     csize = sizecoeffW;

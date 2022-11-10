@@ -41,6 +41,8 @@ ComplexDouble dot(Orbital bra, Orbital ket);
 ComplexVector dot(OrbitalVector &Bra, OrbitalVector &Ket);
 ComplexDouble node_norm_dot(Orbital bra, Orbital ket, bool exact);
 
+void linear_combination(Orbital& out, const ComplexVector& c, OrbitalVector& inp, double prec); 
+
 void normalize(Orbital &phi);
 void orthogonalize(double prec, Orbital &phi, Orbital psi);
 

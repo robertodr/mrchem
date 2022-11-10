@@ -755,7 +755,7 @@ sections:
         type: str
         default: none
         predicates:
-          - value.lower() in ['none', 'chk', 'mw', 'cube']
+          - value.lower() in ['none', 'chk', 'mw', 'cube', 'random']
         docstring: |
           Type of initial guess for response.
           ``none`` will start from a zero guess for the response functions.
@@ -764,6 +764,14 @@ sections:
           ``mw`` will start from final orbitals in a previous calculation written
           using the ``write_orbitals`` keyword. The orbitals will be re-projected
           into the new computational setup.
+          ``random`` will start applying a linear combination, with
+          random coefficients, of the application of monomials in x, y, z.
+      - name: seed
+        type: int
+        default: 0
+        docstring: |
+          Seed of the random number generator used for the ``random``
+          guess. Default value will trigger use of a random seed.
       - name: write_checkpoint
         type: bool
         default: false
@@ -938,6 +946,7 @@ sections:
             docstring: |
               Formulation of the Permittivity function. Currently only the
               exponential is used.
+
   - name: Constants
     docstring: Physical and mathematical constants used by MRChem
     keywords:

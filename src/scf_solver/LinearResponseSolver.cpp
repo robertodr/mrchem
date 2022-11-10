@@ -84,7 +84,10 @@ json LinearResponseSolver::optimize(double omega, Molecule &mol, FockBuilder &F_
     DoubleVector errors_y = DoubleVector::Zero(Phi_0.size());
 
     this->error.push_back(err_t);
-    this->property.push_back(0.0);
+    F_1.setup(adjustPrecision(err_o));
+    double prop = F_1.perturbation().trace(Phi_0, X_n, Y_n).real();
+    F_1.clear();
+    this->property.push_back(prop);
 
     // Setup Helmholtz operators (fixed, based on unperturbed system)
     double helm_prec = getHelmholtzPrec();
@@ -221,7 +224,7 @@ json LinearResponseSolver::optimize(double omega, Molecule &mol, FockBuilder &F_
         // Compute property
         mrcpp::print::header(2, "Computing symmetric property");
         t_lap.start();
-        double prop = F_1.perturbation().trace(Phi_0, X_n, Y_n).real();
+        prop = F_1.perturbation().trace(Phi_0, X_n, Y_n).real();
         mrcpp::print::footer(2, t_lap, 2);
         if (plevel == 1) mrcpp::print::time(1, "Computing symmetric property", t_lap);
 

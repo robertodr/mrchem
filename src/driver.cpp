@@ -38,6 +38,7 @@
 #include "initial_guess/cube.h"
 #include "initial_guess/gto.h"
 #include "initial_guess/mw.h"
+#include "initial_guess/random.h"
 #include "initial_guess/sad.h"
 
 #include "utils/MolPlotter.h"
@@ -845,6 +846,7 @@ bool driver::rsp::guess_orbitals(const json &json_guess, Molecule &mol) {
     auto cube_yp = json_guess["file_CUBE_y_p"];
     auto cube_ya = json_guess["file_CUBE_y_a"];
     auto cube_yb = json_guess["file_CUBE_y_b"];
+    auto seed = json_guess["seed"];
 
     auto &Phi = mol.getOrbitals();
     auto &X = mol.getOrbitalsX();
@@ -858,6 +860,8 @@ bool driver::rsp::guess_orbitals(const json &json_guess, Molecule &mol) {
         success_x = initial_guess::mw::setup(X, prec, mw_xp, mw_xa, mw_xb);
     } else if (type == "cube") {
         success_x = initial_guess::cube::setup(X, prec, cube_xp, cube_xa, cube_xb);
+    } else if (type == "random") {
+        success_x = initial_guess::random::setup(X, Phi, prec, seed);
     } else if (type == "none") {
         mrcpp::print::separator(0, '~');
         print_utils::text(0, "Calculation     ", "Compute initial orbitals");
@@ -877,6 +881,8 @@ bool driver::rsp::guess_orbitals(const json &json_guess, Molecule &mol) {
             success_y = initial_guess::mw::setup(Y, prec, mw_yp, mw_ya, mw_yb);
         } else if (type == "cube") {
             success_x = initial_guess::cube::setup(Y, prec, cube_yp, cube_ya, cube_yb);
+        } else if (type == "random") {
+            success_y = initial_guess::random::setup(Y, Phi, prec, seed);
         } else if (type == "none") {
             mrcpp::print::separator(0, '~');
             print_utils::text(0, "Calculation     ", "Compute initial orbitals");
