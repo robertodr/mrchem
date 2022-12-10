@@ -1,5 +1,5 @@
 {
-    "world_prec": 0.0001,
+    "world_prec": 0.001,
     "world_size": 5,
     "world_unit": "angstrom",
     "MPI": {
@@ -10,33 +10,30 @@
     },
     "WaveFunction": {
         "method": "DFT",
-        "restricted": false
-    },
-    "DFT": {
-        "functionals": "LDA\n"
+        "restricted": true
     },
     "Properties": {
         "polarizability": true
     },
     "Polarizability": {
         "frequency": [
-            0.0,
-	    0.1
+            0.0, 
+            0.001
         ]
     },
     "SCF": {
-        "run": true,
-        "guess_type": "GTO"
+        "run": false,
+        "guess_type": "sad_dz"
     },
     "Response": {
         "kain": 3,
         "max_iter": 10,
-        "orbital_thrs": 0.01,
+        "orbital_thrs": 0.001,
         "run": [
             false,
             false,
             true
         ],
-	"guess": "random"
+	"guess_type": "random"
     }
 }

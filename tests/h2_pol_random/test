@@ -38,7 +38,7 @@ for freq in [0.0, 0.001]:
     passed, message = compare_values(
         cube_guess_alpha_zz,
         zero_guess_alpha_zz,
-        f"Cube guess vs. zero guess for alpha zz. freq={freq}",
+        f"Random guess vs. zero guess for alpha zz. freq={freq}",
         atol=1.0e-2,
         rtol=0.0,
     )
