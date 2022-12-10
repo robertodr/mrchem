@@ -32,11 +32,11 @@ for freq in [0.0, 0.001]:
         zero_guess_alpha_zz = json.load(fh)["output"]["properties"]["polarizability"][f"pol-{freq:1.6f}"]["tensor"][8]
 
     with Path("h2.json").open("r") as fh:
-        cube_guess_alpha_zz = json.load(fh)["output"]["properties"]["polarizability"][f"pol-{freq:1.6f}"]["tensor"][8]
+        random_guess_alpha_zz = json.load(fh)["output"]["properties"]["polarizability"][f"pol-{freq:1.6f}"]["tensor"][8]
 
     # compare up to `world_prec` of calculations
     passed, message = compare_values(
-        cube_guess_alpha_zz,
+        random_guess_alpha_zz,
         zero_guess_alpha_zz,
         f"Random guess vs. zero guess for alpha zz. freq={freq}",
         atol=1.0e-2,
