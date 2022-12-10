@@ -7,5 +7,4 @@ add_integration_test(
   LABELS "H2_static_polarizability_random;polarizability;mrchem;h2_pol_lda"
   COST 100
   LAUNCH_AGENT ${_h2_pol_random_launcher}
-  INITIAL_GUESS ${CMAKE_CURRENT_LIST_DIR}/initial_guess
   )
