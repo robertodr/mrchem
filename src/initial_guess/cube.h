@@ -27,6 +27,9 @@
 
 #include <string>
 
+#include <nlohmann/json.hpp>
+
+#include "analyticfunctions/CUBEfunction.h"
 #include "qmfunctions/qmfunction_fwd.h"
 
 /** @file cube.h
@@ -38,9 +41,9 @@
 namespace mrchem {
 namespace initial_guess {
 namespace cube {
-
 bool setup(OrbitalVector &Phi, double prec, const std::string &file_p, const std::string &file_a, const std::string &file_b);
-
+bool project_mo(OrbitalVector &Phi, double prec, const std::string &mo_file);
+std::vector<mrchem::CUBEfunction> getCUBEFunction(const nlohmann::json &json_cube);
 } // namespace cube
 } // namespace initial_guess
 } // namespace mrchem

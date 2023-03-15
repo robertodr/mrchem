@@ -36,24 +36,10 @@
 
 namespace mrchem {
 
-CUBEfunction::CUBEfunction(const int N_atoms,
-                           const int N_vals,
-                           const std::array<int, 3> N_steps,
-                           const mrcpp::Coord<3> origin,
-                           const std::array<mrcpp::Coord<3>, 3> Voxel_axes,
-                           std::vector<int> Z_n,
-                           std::vector<double> cube,
-                           std::vector<double> atom_charges,
-                           std::vector<mrcpp::Coord<3>> atom_coords)
-        : N_atoms(N_atoms)
-        , N_val(N_vals)
-        , N_steps(N_steps)
+CUBEfunction::CUBEfunction(const std::array<int, 3> &N_steps, const mrcpp::Coord<3> &origin, const std::array<mrcpp::Coord<3>, 3> &Voxel_axes, const std::vector<double> &cube)
+        : N_steps(N_steps)
         , corner(origin)
-        , voxel_axes(Voxel_axes)
-        , atom_numbers(Z_n)
-        , CUBE(cube)
-        , atom_charges(atom_charges)
-        , atom_coords(atom_coords) {
+        , CUBE(cube) {
     Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> voxel_axes(&Voxel_axes[0][0]);
     inv_basis = voxel_axes.transpose().inverse();
 }

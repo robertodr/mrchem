@@ -47,14 +47,7 @@ namespace mrchem {
 
 namespace initial_guess {
 namespace cube {
-
-bool project_mo(OrbitalVector &Phi, double prec, const std::string &mo_file);
-std::vector<mrchem::CUBEfunction> getCUBEFunction(const json &json_cube);
-
-} // namespace cube
-} // namespace initial_guess
-
-bool initial_guess::cube::setup(OrbitalVector &Phi, double prec, const std::string &file_p, const std::string &file_a, const std::string &file_b) {
+bool setup(OrbitalVector &Phi, double prec, const std::string &file_p, const std::string &file_a, const std::string &file_b) {
     if (Phi.size() == 0) return false;
 
     mrcpp::print::separator(0, '~');
@@ -88,7 +81,7 @@ bool initial_guess::cube::setup(OrbitalVector &Phi, double prec, const std::stri
     return success;
 }
 
-bool initial_guess::cube::project_mo(OrbitalVector &Phi, double prec, const std::string &mo_file) {
+bool project_mo(OrbitalVector &Phi, double prec, const std::string &mo_file) {
     if (Phi.size() == 0) return true;
 
     Timer t_tot;
@@ -114,7 +107,7 @@ bool initial_guess::cube::project_mo(OrbitalVector &Phi, double prec, const std:
     ifs >> cube_inp;
     ifs.close();
 
-    auto CUBEVector = initial_guess::cube::getCUBEFunction(cube_inp);
+    auto CUBEVector = getCUBEFunction(cube_inp);
 
     bool success = true;
     for (int i = 0; i < Phi.size(); i++) {
@@ -134,27 +127,23 @@ bool initial_guess::cube::project_mo(OrbitalVector &Phi, double prec, const std:
     return success;
 }
 
-std::vector<mrchem::CUBEfunction> initial_guess::cube::getCUBEFunction(const json &json_cube) {
+std::vector<mrchem::CUBEfunction> getCUBEFunction(const json &json_cube) {
     std::vector<mrchem::CUBEfunction> CUBEVector;
     for (const auto &item : json_cube.items()) {
         auto Header = item.value()["Header"];
-        auto N_atoms = Header["N_atoms"];
         auto origin = Header["origin"];
         auto N_steps = Header["N_steps"];
         auto Voxel_axes = Header["Voxel_axes"];
-        auto Z_n = Header["Z_n"];
-        auto atom_charges = Header["atom_charges"];
-        auto atom_coords = Header["atom_coords"];
-        auto N_vals = Header["N_vals"];
         for (const auto &value : item.value()["CUBE_data"].items()) {
             // the data is saved as a vector of vectors indexing as
             // CUBE_data[ID][x_val*n_steps[1]*n_steps[2] + y_val*n_steps[2] + z_val]
             auto CUBE_data = value.value();
-            mrchem::CUBEfunction single_cube(N_atoms, N_vals, N_steps, origin, Voxel_axes, Z_n, CUBE_data, atom_charges, atom_coords);
+            mrchem::CUBEfunction single_cube(N_steps, origin, Voxel_axes, CUBE_data);
             CUBEVector.push_back(single_cube);
         }
     }
 
     return CUBEVector;
 }
+} // namespace cube
 } // namespace mrchem
