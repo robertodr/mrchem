@@ -131,15 +131,15 @@ std::vector<mrchem::CUBEfunction> getCUBEFunction(const json &json_cube) {
     std::vector<mrchem::CUBEfunction> CUBEVector;
     for (const auto &item : json_cube.items()) {
         auto Header = item.value()["Header"];
+
         auto origin = Header["origin"];
         auto N_steps = Header["N_steps"];
         auto Voxel_axes = Header["Voxel_axes"];
-        for (const auto &value : item.value()["CUBE_data"].items()) {
+
+        for (const auto &x : item.value()["CUBE_data"].items()) {
             // the data is saved as a vector of vectors indexing as
             // CUBE_data[ID][x_val*n_steps[1]*n_steps[2] + y_val*n_steps[2] + z_val]
-            auto CUBE_data = value.value();
-            mrchem::CUBEfunction single_cube(N_steps, origin, Voxel_axes, CUBE_data);
-            CUBEVector.push_back(single_cube);
+            CUBEVector.emplace_back(N_steps, origin, Voxel_axes, x.value());
         }
     }
 

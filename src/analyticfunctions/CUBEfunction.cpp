@@ -32,17 +32,8 @@
 #include <string>
 
 #include <Eigen/Core>
-#include <Eigen/StdVector>
 
 namespace mrchem {
-
-CUBEfunction::CUBEfunction(const std::array<int, 3> &N_steps, const mrcpp::Coord<3> &origin, const std::array<mrcpp::Coord<3>, 3> &Voxel_axes, const std::vector<double> &cube)
-        : N_steps(N_steps)
-        , corner(origin)
-        , CUBE(cube) {
-    Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> voxel_axes(&Voxel_axes[0][0]);
-    inv_basis = voxel_axes.transpose().inverse();
-}
 
 // Do a quadrature of the file
 double CUBEfunction::evalf(const mrcpp::Coord<3> &r) const {
@@ -59,8 +50,7 @@ double CUBEfunction::evalf(const mrcpp::Coord<3> &r) const {
 
     double c;
     // perform NX_j \cdot r to find the indices i, j and k of the cubefile.
-    Eigen::Map<const Eigen::Vector3d> r_vec(&r[0]);
-    Eigen::Map<const Eigen::Vector3d> origin(&corner[0]);
+    Eigen::Map<const Eigen::Vector3d> r_vec(r.data());
     Eigen::Vector3d coeff = ((inv_basis * (r_vec - origin))); // coefficients i, j and k in r = i*X + j*Y + k*Z assuming basis is orthogonal
 
     // do the trilinear interpolation naively without loops or any logic (just plug in the equations)
@@ -84,8 +74,8 @@ double CUBEfunction::evalf(const mrcpp::Coord<3> &r) const {
         auto d_idx1 = coeff(1) - idx1;
         auto d_idx2 = coeff(2) - idx2;
 
-        auto N_steps1 = N_steps.at(1);
-        auto N_steps2 = N_steps.at(2);
+        auto N_steps1 = N_steps(1);
+        auto N_steps2 = N_steps(2);
 
         auto c000 = CUBE[(idx0)*N_steps1 * N_steps2 + (idx1)*N_steps2 + (idx2)];
         auto c001 = CUBE[(idx0)*N_steps1 * N_steps2 + (idx1)*N_steps2 + (1 + idx2)];
