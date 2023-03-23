@@ -27,6 +27,7 @@
 
 #include <string>
 
+#include <highfive/H5Easy.hpp>
 #include <nlohmann/json.hpp>
 
 #include "analyticfunctions/CUBEfunction.h"
@@ -45,5 +46,11 @@ bool setup(OrbitalVector &Phi, double prec, const std::string &file_p, const std
 bool project_mo(OrbitalVector &Phi, double prec, const std::string &mo_file);
 std::vector<mrchem::CUBEfunction> getCUBEFunction(const nlohmann::json &json_cube);
 } // namespace cube
+
+namespace hdf5 {
+bool setup(OrbitalVector &Phi, double prec, const std::string &h5fname);
+bool project_mo(OrbitalVector &Phi, double prec, const H5Easy::File &h5file, const std::string &spin_lbl);
+std::vector<mrchem::CUBEfunction> getCUBEFunction(const H5Easy::File &h5file, const std::string &spin_lbl);
+} // namespace hdf5
 } // namespace initial_guess
 } // namespace mrchem
