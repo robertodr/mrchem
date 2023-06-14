@@ -50,6 +50,8 @@ namespace mrchem {
 
 class Density final : public mrcpp::ComplexFunction {
 public:
+    Density()
+            : mrcpp::ComplexFunction(0, -1, -1, false) {}
     explicit Density(bool share)
             : mrcpp::ComplexFunction(0, -1, -1, share) {}
     Density(const Density &dens)
