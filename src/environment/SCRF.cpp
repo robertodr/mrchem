@@ -48,7 +48,16 @@ using OrbitalVector_p = std::shared_ptr<mrchem::OrbitalVector>;
 
 namespace mrchem {
 
-SCRF::SCRF(Permittivity e, const Nuclei &N, PoissonOperator_p P, DerivativeOperator_p D, double orb_prec, int kain_hist, int max_iter, bool acc_pot, bool dyn_thrs, std::string density_type)
+SCRF::SCRF(const Permittivity &e,
+           const Nuclei &N,
+           PoissonOperator_p P,
+           DerivativeOperator_p D,
+           double orb_prec,
+           int kain_hist,
+           int max_iter,
+           bool acc_pot,
+           bool dyn_thrs,
+           const std::string &density_type)
         : accelerate_Vr(acc_pot)
         , dynamic_thrs(dyn_thrs)
         , density_type(density_type)
@@ -161,7 +170,7 @@ void SCRF::accelerateConvergence(mrcpp::ComplexFunction &dfunc, mrcpp::ComplexFu
     dPhi_n.clear();
 }
 
-void SCRF::nestedSCRF(mrcpp::ComplexFunction V_vac) {
+void SCRF::nestedSCRF(const mrcpp::ComplexFunction &V_vac) {
     KAIN kain(this->history);
     kain.setLocalPrintLevel(10);
 

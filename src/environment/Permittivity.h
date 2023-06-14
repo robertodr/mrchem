@@ -55,7 +55,7 @@ public:
      *  @param formulation Decides which formulation of the #Permittivity function to implement, only exponential
      * available as of now.
      */
-    Permittivity(const Cavity cavity, double epsilon_in, double epsilon_out, std::string formulation);
+    Permittivity(const Cavity &cavity, double epsilon_in, double epsilon_out, const std::string &formulation);
 
     /** @brief Evaluates Permittivity at a point in 3D space with respect to the state of #inverse.
      *  @param r coordinates of a 3D point in space.
@@ -95,7 +95,7 @@ public:
     void printParameters() const;
 
 private:
-    bool inverse = false;    //!< State of #evalf
+    bool inverse{false};     //!< State of #evalf
     double epsilon_in;       //!< Dielectric constant describing the permittivity of free space.
     double epsilon_out;      //!< Dielectric constant describing the permittivity of the solvent.
     std::string formulation; //!< Formulation of the permittivity function, only exponential is used as of now.

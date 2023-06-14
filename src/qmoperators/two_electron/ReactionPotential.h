@@ -43,26 +43,20 @@ class ReactionPotential final : public QMPotential {
 public:
     /** @brief Initializes the ReactionPotential class.
      *  @param scrf_p A SCRF instance which contains the parameters needed to compute the ReactionPotential.
-     *  @param Phi_p A pointer to a vector which contains the orbitals optimized in the SCF procedure. */
+     *  @param Phi_p A pointer to a vector which contains the orbitals optimized in the SCF procedure.
+     */
     ReactionPotential(std::unique_ptr<SCRF> scrf_p, std::shared_ptr<mrchem::OrbitalVector> Phi_p);
     ~ReactionPotential() override { free(NUMBER::Total); }
 
-    SCRF *getHelper() { return this->helper.get(); }
     double getElectronicEnergy() { return this->helper->getElectronicEnergy(); }
     double getNuclearEnergy() { return this->helper->getNuclearEnergy(); }
     double getTotalEnergy() { return this->helper->getTotalEnergy(); }
 
-    /** @brief Updates the helper.mo_residual member variable. This variable is used to set the convergence criterion in
-     * the dynamic convergence method. */
+    /** @brief Updates the helper.mo_residual member variable.
+     *
+     * This variable is used to set the convergence criterion in the dynamic convergence method.
+     */
     void updateMOResidual(double const err_t) { this->helper->mo_residual = err_t; }
-
-    mrcpp::ComplexFunction &getCurrentReactionPotential() { return this->helper->getCurrentReactionPotential(); }
-    mrcpp::ComplexFunction &getPreviousReactionPotential() { return this->helper->getPreviousReactionPotential(); }
-    mrcpp::ComplexFunction &getCurrentDifferenceReactionPotential() { return this->helper->getCurrentDifferenceReactionPotential(); }
-
-    mrcpp::ComplexFunction &getCurrentGamma() { return this->helper->getCurrentGamma(); }
-    mrcpp::ComplexFunction &getPreviousGamma() { return this->helper->getPreviousGamma(); }
-    mrcpp::ComplexFunction &getCurrentDifferenceGamma() { return this->helper->getCurrentDifferenceGamma(); }
 
     friend class ReactionOperator;
 

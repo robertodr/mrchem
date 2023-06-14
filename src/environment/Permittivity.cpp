@@ -29,7 +29,7 @@
 
 namespace mrchem {
 
-Permittivity::Permittivity(const mrchem::Cavity cavity, double epsilon_in, double epsilon_out, std::string formulation)
+Permittivity::Permittivity(const mrchem::Cavity &cavity, double epsilon_in, double epsilon_out, const std::string &formulation)
         : epsilon_in(epsilon_in)
         , epsilon_out(epsilon_out)
         , formulation(formulation)

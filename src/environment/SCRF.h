@@ -37,7 +37,7 @@ class Nuclei;
 class KAIN;
 class SCRF final {
 public:
-    SCRF(Permittivity e,
+    SCRF(const Permittivity &e,
          const Nuclei &N,
          std::shared_ptr<mrcpp::PoissonOperator> P,
          std::shared_ptr<mrcpp::DerivativeOperator<3>> D,
@@ -46,23 +46,10 @@ public:
          int max_iter,
          bool acc_pot,
          bool dyn_thrs,
-         std::string density_type);
+         const std::string &density_type);
     ~SCRF();
-    void UpdateExternalDensity(Density new_density) { this->rho_ext = new_density; }
 
     double setConvergenceThreshold(double prec);
-
-    mrcpp::ComplexFunction &getCurrentReactionPotential() { return this->Vr_n; }
-    mrcpp::ComplexFunction &getPreviousReactionPotential() { return this->Vr_nm1; }
-    mrcpp::ComplexFunction &getCurrentDifferenceReactionPotential() { return this->dVr_n; }
-
-    mrcpp::ComplexFunction &getCurrentGamma() { return this->gamma_n; }
-    mrcpp::ComplexFunction &getPreviousGamma() { return this->gamma_nm1; }
-    mrcpp::ComplexFunction &getCurrentDifferenceGamma() { return this->dgamma_n; }
-
-    Permittivity &getPermittivity() { return this->epsilon; }
-
-    void updateMOResidual(double const err_t) { this->mo_residual = err_t; }
 
     friend class ReactionPotential;
 
@@ -108,7 +95,7 @@ private:
     void accelerateConvergence(mrcpp::ComplexFunction &dfunc, mrcpp::ComplexFunction &func, KAIN &kain);
 
     // TODO    void variationalSCRF(mrcpp::ComplexFunction V_vac);
-    void nestedSCRF(mrcpp::ComplexFunction V_vac);
+    void nestedSCRF(const mrcpp::ComplexFunction &V_vac);
     mrcpp::ComplexFunction &setup(double prec, const std::shared_ptr<mrchem::OrbitalVector> &Phi);
 
     double getNuclearEnergy();
