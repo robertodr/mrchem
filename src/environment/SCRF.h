@@ -59,13 +59,15 @@ protected:
 private:
     bool accelerate_Vr;
     bool dynamic_thrs;
-    std::string density_type;
 
     int max_iter;
     int history;
+
     double apply_prec;
     double conv_thrs;
     double mo_residual;
+
+    std::string density_type;
 
     Permittivity epsilon;
 
@@ -87,7 +89,7 @@ private:
 
     void setDCavity();
 
-    void computeDensities(OrbitalVector &Phi);
+    void updateDensities(Density &rho_el);
     void computeGamma(mrcpp::ComplexFunction &potential, mrcpp::ComplexFunction &out_gamma);
 
     mrcpp::ComplexFunction solvePoissonEquation(const mrcpp::ComplexFunction &ingamma);
@@ -96,7 +98,7 @@ private:
 
     // TODO    void variationalSCRF(mrcpp::ComplexFunction V_vac);
     void nestedSCRF(const mrcpp::ComplexFunction &V_vac);
-    mrcpp::ComplexFunction &setup(double prec, const std::shared_ptr<mrchem::OrbitalVector> &Phi);
+    mrcpp::ComplexFunction &setup(double prec, Density &rho_el);
 
     double getNuclearEnergy();
     double getElectronicEnergy();

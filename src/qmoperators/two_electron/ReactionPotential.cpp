@@ -27,16 +27,17 @@
 #include <MRCPP/Timer>
 
 #include "ReactionPotential.h"
+#include "qmfunctions/density_utils.h"
 
 using SCRF_p = std::unique_ptr<mrchem::SCRF>;
 using OrbitalVector_p = std::shared_ptr<mrchem::OrbitalVector>;
 
 namespace mrchem {
 
-ReactionPotential::ReactionPotential(SCRF_p scrf_p, OrbitalVector_p Phi_p)
+ReactionPotential::ReactionPotential(SCRF_p scrf, OrbitalVector_p Phi, bool mpi_share)
         : QMPotential(1, false)
-        , helper(std::move(scrf_p))
-        , Phi(Phi_p) {}
+        , helper(std::move(scrf))
+        , orbitals(Phi) {}
 
 void ReactionPotential::setup(double prec) {
     setApplyPrec(prec);
@@ -49,13 +50,22 @@ void ReactionPotential::setup(double prec) {
     mrcpp::print::value(3, "Precision", prec, "(rel)", 5);
     mrcpp::print::value(3, "Threshold", thrs, "(abs)", 5);
     mrcpp::print::separator(3, '-');
-    auto potential = this->helper->setup(prec, this->Phi);
+
+    // construct electronic density from the orbitals
+    OrbitalVector &Phi = *this->orbitals;
+    Density rho_el(false);
+    density::compute(this->apply_prec, rho_el, Phi, DensityType::Total);
+    // change sign, because it's the electronic density
+    rho_el.rescale(-1.0);
+    auto potential = this->helper->setup(prec, rho_el);
+
     mrcpp::cplxfunc::deep_copy(*this, potential);
     if (plevel == 2) print_utils::qmfunction(2, "Reaction operator", *this, timer);
     mrcpp::print::footer(3, timer, 2);
 }
 
 void ReactionPotential::clear() {
+    mrcpp::ComplexFunction::free(NUMBER::Total); // delete FunctionTree pointers
     clearApplyPrec();
     this->helper->clear();
 }

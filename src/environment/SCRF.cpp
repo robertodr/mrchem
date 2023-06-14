@@ -60,26 +60,17 @@ SCRF::SCRF(const Permittivity &e,
            const std::string &density_type)
         : accelerate_Vr(acc_pot)
         , dynamic_thrs(dyn_thrs)
-        , density_type(density_type)
         , max_iter(max_iter)
         , history(kain_hist)
         , apply_prec(orb_prec)
         , conv_thrs(1.0)
         , mo_residual(1.0)
+        , density_type(density_type)
         , epsilon(e)
-        , rho_nuc(false)
-        , rho_ext(false)
-        , rho_tot(false)
-        , Vr_n(false)
-        , dVr_n(false)
-        , Vr_nm1(false)
-        , gamma_n(false)
-        , dgamma_n(false)
-        , gamma_nm1(false)
         , derivative(D)
         , poisson(P) {
     setDCavity();
-    rho_nuc = chemistry::compute_nuclear_density(this->apply_prec, N, 1000);
+    this->rho_nuc = chemistry::compute_nuclear_density(this->apply_prec, N, 1000);
 }
 
 SCRF::~SCRF() {
@@ -93,7 +84,7 @@ void SCRF::clear() {
 double SCRF::setConvergenceThreshold(double prec) {
     // converge_thrs should be in the interval [prec, 1.0]
     this->conv_thrs = prec;
-    if (this->dynamic_thrs and this->mo_residual > 10 * prec) this->conv_thrs = std::min(1.0, this->mo_residual);
+    if (this->dynamic_thrs && this->mo_residual > 10 * prec) this->conv_thrs = std::min(1.0, this->mo_residual);
     return this->conv_thrs;
 }
 
@@ -107,12 +98,9 @@ void SCRF::setDCavity() {
     mrcpp::project<3>(this->apply_prec / 100, this->d_cavity, this->epsilon.getGradVector());
 }
 
-void SCRF::computeDensities(OrbitalVector &Phi) {
+void SCRF::updateDensities(Density &rho_el) {
     Timer timer;
     resetComplexFunction(this->rho_tot);
-    Density rho_el(false);
-    density::compute(this->apply_prec, rho_el, Phi, DensityType::Total);
-    rho_el.rescale(-1.0);
     if (this->density_type == "electronic") {
         mrcpp::cplxfunc::deep_copy(this->rho_tot, rho_el);
     } else if (this->density_type == "nuclear") {
@@ -249,9 +237,9 @@ void SCRF::printConvergenceRow(int i, double norm, double update, double time) c
     println(3, o_txt.str());
 }
 
-mrcpp::ComplexFunction &SCRF::setup(double prec, const OrbitalVector_p &Phi) {
+mrcpp::ComplexFunction &SCRF::setup(double prec, Density &rho_el) {
     this->apply_prec = prec;
-    computeDensities(*Phi);
+    updateDensities(rho_el);
     Timer t_vac;
     mrcpp::ComplexFunction V_vac;
     V_vac.alloc(NUMBER::Real);

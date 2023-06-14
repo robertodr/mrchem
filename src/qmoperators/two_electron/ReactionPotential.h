@@ -42,11 +42,11 @@ namespace mrchem {
 class ReactionPotential final : public QMPotential {
 public:
     /** @brief Initializes the ReactionPotential class.
-     *  @param scrf_p A SCRF instance which contains the parameters needed to compute the ReactionPotential.
-     *  @param Phi_p A pointer to a vector which contains the orbitals optimized in the SCF procedure.
+     *  @param scrf A SCRF instance which contains the parameters needed to compute the ReactionPotential.
+     *  @param Phi A pointer to a vector which contains the orbitals optimized in the SCF procedure.
      */
-    ReactionPotential(std::unique_ptr<SCRF> scrf_p, std::shared_ptr<mrchem::OrbitalVector> Phi_p);
-    ~ReactionPotential() override { free(NUMBER::Total); }
+    explicit ReactionPotential(std::unique_ptr<SCRF> scrf, std::shared_ptr<mrchem::OrbitalVector> Phi = nullptr, bool mpi_share = false);
+    ~ReactionPotential() override = default;
 
     double getElectronicEnergy() { return this->helper->getElectronicEnergy(); }
     double getNuclearEnergy() { return this->helper->getNuclearEnergy(); }
@@ -61,13 +61,11 @@ public:
     friend class ReactionOperator;
 
 protected:
-    void clear();
+    std::unique_ptr<SCRF> helper;            ///< A SCRF instance used to compute the ReactionPotential.
+    std::shared_ptr<OrbitalVector> orbitals; ///< Unperturbed orbitals defining the ground-state electron density for the SCRF procedure.
 
-private:
-    std::unique_ptr<SCRF> helper;               //!< A SCRF instance used to compute the ReactionPotential.
-    std::shared_ptr<mrchem::OrbitalVector> Phi; //!< holds the Orbitals needed to compute the electronic density for the SCRF procedure.
-
-    void setup(double prec);
+    void setup(double prec) override;
+    void clear() override;
 };
 
 } // namespace mrchem
