@@ -39,7 +39,7 @@ namespace mrchem {
  *  where \f$\rho\f$ is the total molecular density of a solute molecule, \f$\epsilon\f$ is
  *  the Permittivity function of the continuum and \f$\gamma_s\f$ is the surface charge distribution.
  */
-class ReactionPotential final : public QMPotential {
+class ReactionPotential : public QMPotential {
 public:
     /** @brief Initializes the ReactionPotential class.
      *  @param scrf A SCRF instance which contains the parameters needed to compute the ReactionPotential.
@@ -66,6 +66,9 @@ protected:
 
     void setup(double prec) override;
     void clear() override;
+
+private:
+    virtual mrcpp::ComplexFunction &computePotential(double prec) const = 0;
 };
 
 } // namespace mrchem

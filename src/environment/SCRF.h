@@ -51,7 +51,11 @@ public:
 
     double setConvergenceThreshold(double prec);
 
+    auto getDensityType() const -> std::string { return this->density_type; }
+
     friend class ReactionPotential;
+    friend class ReactionPotentialD1;
+    friend class ReactionPotentialD2;
 
 protected:
     void clear();

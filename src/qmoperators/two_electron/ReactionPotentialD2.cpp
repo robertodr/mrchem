@@ -23,49 +23,43 @@
  * <https://mrchem.readthedocs.io/>
  */
 
-#include <MRCPP/Printer>
-#include <MRCPP/Timer>
+#include "MRCPP/Printer"
+#include "MRCPP/Timer"
 
-#include "ReactionPotential.h"
+#include "ReactionPotentialD2.h"
 #include "qmfunctions/density_utils.h"
+#include "utils/print_utils.h"
 
 using mrcpp::Printer;
 using mrcpp::Timer;
 
-using SCRF_p = std::unique_ptr<mrchem::SCRF>;
 using OrbitalVector_p = std::shared_ptr<mrchem::OrbitalVector>;
 
 namespace mrchem {
 
-ReactionPotential::ReactionPotential(SCRF_p scrf, OrbitalVector_p Phi, bool mpi_share)
-        : QMPotential(1, mpi_share)
-        , helper(std::move(scrf))
-        , orbitals(Phi) {}
+ReactionPotentialD2::ReactionPotentialD2(std::unique_ptr<SCRF> scrf, std::shared_ptr<mrchem::OrbitalVector> Phi, std::shared_ptr<OrbitalVector> X, std::shared_ptr<OrbitalVector> Y, bool mpi_share)
+        : ReactionPotential(std::move(scrf), Phi, mpi_share)
+        , orbitals_x(X)
+        , orbitals_y(Y) {}
 
-void ReactionPotential::setup(double prec) {
-    if (isSetup(prec)) return;
-    setApplyPrec(prec);
-    auto thrs = this->helper->setConvergenceThreshold(prec);
+mrcpp::ComplexFunction &ReactionPotentialD2::computePotential(double prec) const {
+    // construct perturbed density from the orbitals
+    if (this->orbitals == nullptr) MSG_ERROR("Orbitals not initialized");
+    if (this->orbitals_x == nullptr) MSG_ERROR("Perturbed X orbitals not initialized");
+    if (this->orbitals_y == nullptr) MSG_ERROR("Perturbed Y orbitals not initialized");
+
+    Density rho;
+    OrbitalVector &Phi = *this->orbitals;
+    OrbitalVector &X = *this->orbitals_x;
+    OrbitalVector &Y = *this->orbitals_y;
+
     Timer timer;
-    auto plevel = Printer::getPrintLevel();
-    mrcpp::print::separator(3, '=');
-    print_utils::centered_text(3, "Building Reaction operator");
-    this->helper->printParameters();
-    mrcpp::print::value(3, "Precision", prec, "(rel)", 5);
-    mrcpp::print::value(3, "Threshold", thrs, "(abs)", 5);
-    mrcpp::print::separator(3, '-');
+    density::compute(prec, rho, Phi, X, Y, DensityType::Total);
+    print_utils::qmfunction(3, "Compute global density", rho, timer);
+    // change sign, because it's the electronic density
+    // TODO not sure whether this is needed?
+    rho.rescale(-1.0);
 
-    auto potential = this->computePotential(prec);
-
-    mrcpp::cplxfunc::deep_copy(*this, potential);
-    if (plevel == 2) print_utils::qmfunction(2, "Reaction operator", *this, timer);
-    mrcpp::print::footer(3, timer, 2);
+    return this->helper->setup(prec, rho);
 }
-
-void ReactionPotential::clear() {
-    mrcpp::ComplexFunction::free(NUMBER::Total); // delete FunctionTree pointers
-    clearApplyPrec();
-    this->helper->clear();
-}
-
 } // namespace mrchem

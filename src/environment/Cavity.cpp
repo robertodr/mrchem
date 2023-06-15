@@ -51,7 +51,7 @@ namespace detail {
  * where the subscript \f$i\f$ is the index related to each
  * sphere in the cavity, and \f$\operatorname{s}\f$ is the signed normal distance from the surface of each sphere.
  *   @param r The coordinates of a test point in 3D space.
- *   @param index An integer that defines the variable of differentiation (0->x, 1->z and 2->z).
+ *   @param index An integer that defines the variable of differentiation (0->x, 1->y and 2->z).
  *   @param centers A vector containing the coordinates of the centers of the spheres in the cavity.
  *   @param radii A vector containing the radii of the spheres.
  *   @param width A double value describing the width of the transition at the boundary of the spheres.
@@ -105,6 +105,9 @@ Cavity::Cavity(const std::vector<mrcpp::Coord<3>> &coords, const std::vector<dou
         , centers{coords} {
     // compute the radii
     for (auto i = 0; i < this->radii_0.size(); ++i) { this->radii.push_back(this->radii_0[i] * this->alphas[i] + this->betas[i] * this->sigmas[i]); }
+
+    // build neighbors list
+    auto neighbors = detail::neighbors_list(this->centers, this->radii);
 
     auto p_gradcavity = [&cs = this->centers, &rs = this->radii, &ws = this->sigmas](const mrcpp::Coord<3> &r, int index) { return detail::gradCavity(r, index, cs, rs, ws); };
     for (auto i = 0; i < 3; i++) {

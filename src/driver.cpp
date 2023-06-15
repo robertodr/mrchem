@@ -421,8 +421,11 @@ bool driver::scf::guess_energy(const json &json_guess, Molecule &mol, FockBuilde
     auto &F_mat = mol.getFockMatrix();
     Phi.distribute();
     F_mat = ComplexMatrix::Zero(Phi.size(), Phi.size());
-    if (localize) orbital::localize(prec, Phi, F_mat);
-    else orbital::diagonalize(prec, Phi, F_mat);
+    if (localize) {
+        orbital::localize(prec, Phi, F_mat);
+    } else {
+        orbital::diagonalize(prec, Phi, F_mat);
+    }
 
     F.setup(prec);
     F_mat = F(Phi, Phi);
@@ -1054,14 +1057,26 @@ void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuild
         auto eps_i = json_fock["reaction_operator"]["epsilon_in"];
         auto eps_o = json_fock["reaction_operator"]["epsilon_out"];
         auto formulation = json_fock["reaction_operator"]["formulation"];
-        auto accelerate_pot = (optimizer == "potential") ? true : false;
+        auto accelerate_pot = (optimizer == "potential");
 
-        Permittivity dielectric_func(*cavity_p, eps_i, eps_o, formulation);
-        dielectric_func.printParameters();
+        // TODO figure out how to work with static and dynamic permittivities
+        if (order == 0) {
+            Permittivity dielectric_func(*cavity_p, eps_i, eps_o, formulation);
+            dielectric_func.printParameters();
 
-        auto scrf_p = std::make_unique<SCRF>(dielectric_func, nuclei, P_p, D_p, poisson_prec, kain, max_iter, accelerate_pot, dynamic_thrs, density_type);
-        auto V_R = std::make_shared<ReactionOperator>(std::move(scrf_p), Phi_p);
-        F.getReactionOperator() = V_R;
+            auto scrf_p = std::make_unique<SCRF>(dielectric_func, nuclei, P_p, D_p, poisson_prec, kain, max_iter, accelerate_pot, dynamic_thrs, density_type);
+            auto V_R = std::make_shared<ReactionOperator>(std::move(scrf_p), Phi_p);
+            F.getReactionOperator() = V_R;
+        } else if (order == 1) {
+            Permittivity dielectric_func(*cavity_p, eps_i, eps_o, formulation);
+            dielectric_func.printParameters();
+
+            auto scrf_p = std::make_unique<SCRF>(dielectric_func, nuclei, P_p, D_p, poisson_prec, kain, max_iter, accelerate_pot, dynamic_thrs, "electronic");
+            auto V_R = std::make_shared<ReactionOperator>(std::move(scrf_p), Phi_p, X_p, Y_p);
+            F.getReactionOperator() = V_R;
+        } else {
+            MSG_ABORT("Invalid perturbation order");
+        }
     }
     ///////////////////////////////////////////////////////////
     ////////////////////   XC Operator   //////////////////////
