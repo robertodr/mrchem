@@ -922,8 +922,6 @@ User input reference
             
               **Type** ``float``
             
-              **Default** ``1.0``
-            
              :epsilon_dynamic: Dynamic permittivity outside the cavity. This is characteristic of the solvent used and relevant only in response calcualtions. Defaults to the same value as `epsilon_static`, *i.e.* _not_ using the response non-equilibrium formulation. 
             
               **Type** ``float``

@@ -939,7 +939,6 @@ sections:
             keywords:
               - name: epsilon_static
                 type: float
-                default: 1.0
                 docstring: |
                   Static permittivity outside the cavity. This is characteristic of the
                   solvent used.
