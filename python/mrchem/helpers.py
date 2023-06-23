@@ -80,7 +80,8 @@ def write_scf_fock(user_dict, wf_dict, origin):
             "dynamic_thrs": user_dict["PCM"]["SCRF"]["dynamic_thrs"],
             "density_type": user_dict["PCM"]["SCRF"]["density_type"],
             "epsilon_in": user_dict["PCM"]["Permittivity"]["epsilon_in"],
-            "epsilon_out": user_dict["PCM"]["Permittivity"]["epsilon_out"],
+            "epsilon_static": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_static"],
+            "epsilon_dynamic": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_dynamic"],
             "formulation": user_dict["PCM"]["Permittivity"]["formulation"],
         }
 
@@ -414,7 +415,8 @@ def write_rsp_fock(user_dict, wf_dict):
             "dynamic_thrs": user_dict["PCM"]["SCRF"]["dynamic_thrs"],
             "density_type": user_dict["PCM"]["SCRF"]["density_type"],
             "epsilon_in": user_dict["PCM"]["Permittivity"]["epsilon_in"],
-            "epsilon_out": user_dict["PCM"]["Permittivity"]["epsilon_out"],
+            "epsilon_static": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_static"],
+            "epsilon_dynamic": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_dynamic"],
             "formulation": user_dict["PCM"]["Permittivity"]["formulation"],
         }
 

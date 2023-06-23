@@ -1048,6 +1048,7 @@ void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuild
         auto P_p = std::make_shared<PoissonOperator>(*MRA, poisson_prec);
         auto D_p = std::make_shared<mrcpp::ABGVOperator<3>>(*MRA, 0.0, 0.0);
         auto cavity_p = mol.getCavity_p();
+        cavity_p->printParameters();
 
         auto kain = json_fock["reaction_operator"]["kain"];
         auto max_iter = json_fock["reaction_operator"]["max_iter"];
@@ -1055,20 +1056,21 @@ void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuild
         auto dynamic_thrs = json_fock["reaction_operator"]["dynamic_thrs"];
         auto density_type = json_fock["reaction_operator"]["density_type"];
         auto eps_i = json_fock["reaction_operator"]["epsilon_in"];
-        auto eps_o = json_fock["reaction_operator"]["epsilon_out"];
+        auto eps_s = json_fock["reaction_operator"]["epsilon_static"];
+        auto eps_d = json_fock["reaction_operator"]["epsilon_dynamic"];
         auto formulation = json_fock["reaction_operator"]["formulation"];
         auto accelerate_pot = (optimizer == "potential");
 
         // TODO figure out how to work with static and dynamic permittivities
         if (order == 0) {
-            Permittivity dielectric_func(*cavity_p, eps_i, eps_o, formulation);
+            Permittivity dielectric_func(*cavity_p, eps_i, eps_s, formulation);
             dielectric_func.printParameters();
 
             auto scrf_p = std::make_unique<SCRF>(dielectric_func, nuclei, P_p, D_p, poisson_prec, kain, max_iter, accelerate_pot, dynamic_thrs, density_type);
             auto V_R = std::make_shared<ReactionOperator>(std::move(scrf_p), Phi_p);
             F.getReactionOperator() = V_R;
         } else if (order == 1) {
-            Permittivity dielectric_func(*cavity_p, eps_i, eps_o, formulation);
+            Permittivity dielectric_func(*cavity_p, eps_i, eps_d, formulation);
             dielectric_func.printParameters();
 
             auto scrf_p = std::make_unique<SCRF>(dielectric_func, nuclei, P_p, D_p, poisson_prec, kain, max_iter, accelerate_pot, dynamic_thrs, "electronic");
