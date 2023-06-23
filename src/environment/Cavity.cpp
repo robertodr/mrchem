@@ -106,9 +106,6 @@ Cavity::Cavity(const std::vector<mrcpp::Coord<3>> &coords, const std::vector<dou
     // compute the radii
     for (auto i = 0; i < this->radii_0.size(); ++i) { this->radii.push_back(this->radii_0[i] * this->alphas[i] + this->betas[i] * this->sigmas[i]); }
 
-    // build neighbors list
-    auto neighbors = detail::neighbors_list(this->centers, this->radii);
-
     auto p_gradcavity = [&cs = this->centers, &rs = this->radii, &ws = this->sigmas](const mrcpp::Coord<3> &r, int index) { return detail::gradCavity(r, index, cs, rs, ws); };
     for (auto i = 0; i < 3; i++) {
         this->gradvector.push_back([i, p_gradcavity](const mrcpp::Coord<3> &r) -> double { return p_gradcavity(r, i); });
