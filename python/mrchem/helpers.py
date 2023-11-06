@@ -82,6 +82,7 @@ def write_scf_fock(user_dict, wf_dict, origin):
             "epsilon_in": user_dict["PCM"]["Permittivity"]["epsilon_in"],
             "epsilon_static": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_static"],
             "epsilon_dynamic": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_dynamic"],
+            "nonequilibrium": user_dict["PCM"]["Permittivity"]["outside"]["nonequilibrium"],
             "formulation": user_dict["PCM"]["Permittivity"]["formulation"],
         }
 
@@ -417,6 +418,7 @@ def write_rsp_fock(user_dict, wf_dict):
             "epsilon_in": user_dict["PCM"]["Permittivity"]["epsilon_in"],
             "epsilon_static": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_static"],
             "epsilon_dynamic": user_dict["PCM"]["Permittivity"]["outside"]["epsilon_dynamic"],
+            "nonequilibrium": user_dict["PCM"]["Permittivity"]["outside"]["nonequilibrium"],
             "formulation": user_dict["PCM"]["Permittivity"]["formulation"],
         }
 

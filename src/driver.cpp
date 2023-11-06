@@ -103,7 +103,7 @@ namespace driver {
 DerivativeOperator_p get_derivative(const std::string &name);
 template <int I> RankOneOperator<I> get_operator(const std::string &name, const json &json_oper);
 template <int I, int J> RankTwoOperator<I, J> get_operator(const std::string &name, const json &json_oper);
-void build_fock_operator(const json &input, Molecule &mol, FockBuilder &F, int order);
+void build_fock_operator(const json &input, Molecule &mol, FockBuilder &F, int order, bool is_dynamic = false);
 void init_properties(const json &json_prop, Molecule &mol);
 
 namespace scf {
@@ -747,7 +747,7 @@ json driver::rsp::run(const json &json_rsp, Molecule &mol) {
 
     FockBuilder F_1;
     const auto &json_fock_1 = json_rsp["fock_operator"];
-    driver::build_fock_operator(json_fock_1, mol, F_1, 1);
+    driver::build_fock_operator(json_fock_1, mol, F_1, 1, dynamic);
 
     const auto &json_pert = json_rsp["perturbation"];
     auto h_1 = driver::get_operator<3>(json_pert["operator"], json_pert);
@@ -984,7 +984,7 @@ void driver::rsp::calc_properties(const json &json_prop, Molecule &mol, int dir,
  * construct all operator which are present in this input. Option to set
  * perturbation order of the operators.
  */
-void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuilder &F, int order) {
+void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuilder &F, int order, bool is_dynamic) {
     auto &nuclei = mol.getNuclei();
     auto Phi_p = mol.getOrbitals_p();
     auto X_p = mol.getOrbitalsX_p();
@@ -1058,11 +1058,12 @@ void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuild
         auto eps_i = json_fock["reaction_operator"]["epsilon_in"];
         auto eps_s = json_fock["reaction_operator"]["epsilon_static"];
         auto eps_d = json_fock["reaction_operator"]["epsilon_dynamic"];
+        auto noneq = json_fock["reaction_operator"]["nonequilibrium"];
         auto formulation = json_fock["reaction_operator"]["formulation"];
         auto accelerate_pot = (optimizer == "potential");
 
-        // TODO figure out how to work with static and dynamic permittivities
         if (order == 0) {
+            // for the ground state, always use the static permittivity
             Permittivity dielectric_func(*cavity_p, eps_i, eps_s, formulation);
             dielectric_func.printParameters();
 
@@ -1070,7 +1071,10 @@ void driver::build_fock_operator(const json &json_fock, Molecule &mol, FockBuild
             auto V_R = std::make_shared<ReactionOperator>(std::move(scrf_p), Phi_p);
             F.getReactionOperator() = V_R;
         } else if (order == 1) {
-            Permittivity dielectric_func(*cavity_p, eps_i, eps_d, formulation);
+            // in response, use dynamic permittivity if:
+            // a. nonequilibrium was requested, and
+            // b. the frequency is nonzero
+            auto dielectric_func = is_dynamic && noneq ? Permittivity(*cavity_p, eps_i, eps_d, formulation) : Permittivity(*cavity_p, eps_i, eps_s, formulation);
             dielectric_func.printParameters();
 
             auto scrf_p = std::make_unique<SCRF>(dielectric_func, nuclei, P_p, D_p, poisson_prec, kain, max_iter, accelerate_pot, dynamic_thrs, "electronic");
