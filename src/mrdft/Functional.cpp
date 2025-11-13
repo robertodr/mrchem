@@ -83,9 +83,11 @@ Eigen::MatrixXd Functional::evaluate_transposed(Eigen::MatrixXd &inp) const {
         } else {
             if (inp(i, 0) < cutoff) calc = false;
         }
-        for (int j = 0; j < nInp; j++) inp_row(j) = inp(i, j);
-        if (calc) xcfun_eval(xcfun.get(), inp_row.data(), out_row.data());
-        for (int j = 0; j < nOut; j++) out(i, j) = out_row(j);
+        if (calc) {
+            inp_row = inp.row(i);
+            xcfun_eval(xcfun.get(), inp_row.data(), out_row.data());
+            out.row(i) = out_row;
+        }
     }
     return out;
 }
@@ -307,6 +309,7 @@ void Functional::makepot(mrcpp::FunctionTreeVector<3> &inp, std::vector<mrcpp::F
                 node.attachCoefs(Ctrout.col(xc_outsize + 3*(i-1) + d).data());
                 node.cvTransform(mrcpp::Backward);
                 node.mwTransform(mrcpp::Compression);
+                node.calcNorms();
                 mrcpp::DerivativeCalculator<3> derivcalc(d,*this->derivOp, *rho0);//TODO: define outside loops
                 mrcpp::MWNode<3> noded(rho0->getNode(nodeIdx),true,false);
                 derivcalc.calcNode(node, noded);
